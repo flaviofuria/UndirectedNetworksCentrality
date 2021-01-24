@@ -74,19 +74,3 @@ def katz(g: nx.Graph()) -> dict:
 
 def pagerank(g: nx.Graph()) -> dict:
     pass
-
-
-if __name__ == '__main__':
-    edges = [(1, 2), (1, 3), (2, 3)]
-    graph = nx.Graph(edges)
-    graph.add_node(4)
-    graph.add_node(5)
-
-    new_graph = nx.Graph(edges)
-    new_graph.add_edge(4, 5)
-
-    #print('lin: ' + str(lin(graph)))
-    #print('closeness: ' + str(closeness(graph)))
-
-    print(eigenvector(graph))
-    print(eigenvector(new_graph))

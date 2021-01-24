@@ -74,36 +74,24 @@ if __name__ == '__main__':
     # for k in centralities:
     #     print(str(k) + ' : ' + str(centralities[k]) + ' , ' + str(new_centralities[k]))
 
-
-    # print(list(nx.all_simple_paths(new_graph, source=1, target=2, cutoff=6)))
-
-    #tests.katz(graph)
-
-    #print(graph.edges)
-    #print(new_graph.edges)
-
-    #print(centralities.eigenvector(graph))
-    #print(centralities.eigenvector(new_graph))
-
-    #print(centralities.seeley(graph))
-    #print(centralities.seeley(new_graph))
-
     eigen = centralities.eigenvector(graph)
     new_eigen = centralities.eigenvector(new_graph)
 
-    print(eigen)
-    print(new_eigen)
     for k in eigen.keys():
         if new_eigen[k] < eigen[k] and (k == new_edge[0] or k == new_edge[1]):
-            print('EIGENVECTOR --> node ' + str(k))
+            print('WEAK MONOTONICITY AXIOM FAILED IN NODE ' + str(k) + ' FOR EIGENVECTOR CENTRALITY')
+            print('before edge')
             print(eigen)
+            print('after edge')
             print(new_eigen)
 
     seeley = centralities.seeley(graph)
     new_seeley = centralities.seeley(new_graph)
     for k in seeley.keys():
         if new_seeley[k] < seeley[k] and (k == new_edge[0] or k == new_edge[1]):
-            print('SEELEY --> node' + str(k))
+            print('WEAK MONOTONICITY AXIOM FAILED IN NODE ' + str(k) + ' FOR SEELEY CENTRALITY')
+            print('before edge')
             print(seeley)
+            print('after edge')
             print(new_seeley)
 
