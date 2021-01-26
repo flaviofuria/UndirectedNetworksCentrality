@@ -53,10 +53,10 @@ def seeley(g: nx.Graph()) -> dict:
         for pos in v:
             adj_mat[k - 1][pos - 1] = 1
 
-    for i in range(len(g.nodes)):
-        row_sum = np.sum(adj_mat[i])
-        if row_sum > 0:
-            adj_mat[i] = np.divide(adj_mat[i], row_sum)
+    # for i in range(len(g.nodes)):
+    #     row_sum = np.sum(adj_mat[i])
+    #     if row_sum > 0:
+    #         adj_mat[i] = np.divide(adj_mat[i], row_sum)
 
     eigenvalues, eigenvectors = np.linalg.eig(adj_mat)
     dom_eigenvalue = max(np.amax(eigenvalues), np.absolute(np.amin(eigenvalues)))

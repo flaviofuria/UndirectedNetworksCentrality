@@ -2,7 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import centralities as ct
 from bisect import insort
-import tests
+import test
 import centralities
 
 if __name__ == '__main__':
@@ -77,21 +77,38 @@ if __name__ == '__main__':
     eigen = centralities.eigenvector(graph)
     new_eigen = centralities.eigenvector(new_graph)
 
-    for k in eigen.keys():
-        if new_eigen[k] < eigen[k] and (k == new_edge[0] or k == new_edge[1]):
-            print('WEAK MONOTONICITY AXIOM FAILED IN NODE ' + str(k) + ' FOR EIGENVECTOR CENTRALITY')
-            print('before edge')
-            print(eigen)
-            print('after edge')
-            print(new_eigen)
+    # print('eigen(' + str(new_edge[0]) + ') before: ' + str(round(eigen[new_edge[0]], 5)))
+    # print('eigen(' + str(new_edge[0]) + ') after: ' + str(round(new_eigen[new_edge[0]], 5)))
+    # print('eigen(' + str(new_edge[1]) + ') before: ' + str(round(new_eigen[new_edge[1]], 5)))
+    # print('eigen(' + str(new_edge[1]) + ') after: ' + str(round(new_eigen[new_edge[1]], 5)))
+    # print('\n')
+    # for k in eigen.keys():
+    #     if new_eigen[k] < eigen[k] and (k == new_edge[0] or k == new_edge[1]):
+    #         print('WEAK MONOTONICITY AXIOM FAILED IN NODE ' + str(k) + ' FOR EIGENVECTOR CENTRALITY')
+    #         print('before edge')
+    #         print(eigen)
+    #         print('after edge')
+    #         print(new_eigen)
+
 
     seeley = centralities.seeley(graph)
     new_seeley = centralities.seeley(new_graph)
-    for k in seeley.keys():
-        if new_seeley[k] < seeley[k] and (k == new_edge[0] or k == new_edge[1]):
-            print('WEAK MONOTONICITY AXIOM FAILED IN NODE ' + str(k) + ' FOR SEELEY CENTRALITY')
-            print('before edge')
-            print(seeley)
-            print('after edge')
-            print(new_seeley)
 
+    # for k in seeley.keys():
+    #     if new_seeley[k] < seeley[k] and (k == new_edge[0] or k == new_edge[1]):
+    #         print('WEAK MONOTONICITY AXIOM FAILED IN NODE ' + str(k) + ' FOR SEELEY CENTRALITY')
+    #         print('before edge')
+    #         print(seeley)
+    #         print('after edge')
+    #         print(new_seeley)
+
+    #print('seeley(' + str(new_edge[0]) + ') before: ' + str(round(seeley[new_edge[0]], 5)))
+    #print('seeley(' + str(new_edge[0]) + ') after: ' + str(round(new_seeley[new_edge[0]], 5)))
+    #print('seeley(' + str(new_edge[1]) + ') before: ' + str(round(new_seeley[new_edge[1]], 5)))
+    #print('seeley(' + str(new_edge[1]) + ') after: ' + str(round(new_seeley[new_edge[1]], 5)))
+
+    print(eigen)
+    print(new_eigen)
+
+    print(seeley)
+    print(new_seeley)
