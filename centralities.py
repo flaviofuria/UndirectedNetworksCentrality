@@ -1,6 +1,7 @@
 import networkx as nx
 import numpy as np
 
+
 def degree(g: nx.Graph()) -> dict:
     scores = {}
     for k, v in g.adj.items():
@@ -53,10 +54,10 @@ def seeley(g: nx.Graph()) -> dict:
         for pos in v:
             adj_mat[k - 1][pos - 1] = 1
 
-    # for i in range(len(g.nodes)):
-    #     row_sum = np.sum(adj_mat[i])
-    #     if row_sum > 0:
-    #         adj_mat[i] = np.divide(adj_mat[i], row_sum)
+    for i in range(len(g.nodes)):
+        row_sum = np.sum(adj_mat[i])
+        if row_sum > 0:
+            adj_mat[i] = np.divide(adj_mat[i], row_sum)
 
     eigenvalues, eigenvectors = np.linalg.eig(adj_mat)
     dom_eigenvalue = max(np.amax(eigenvalues), np.absolute(np.amin(eigenvalues)))
@@ -72,5 +73,11 @@ def katz(g: nx.Graph()) -> dict:
     pass
 
 
-def pagerank(g: nx.Graph()) -> dict:
-    pass
+# default alpha=0.85
+# choosing alpha=1.0 should result in computing Seeley centrality
+def pagerank(g: nx.Graph(), a: float) -> dict:
+    return nx.pagerank(g, alpha=a, max_iter=1000)
+
+
+def betweenness(g: nx.Graph()) -> dict:
+    return nx.betweenness_centrality(g)

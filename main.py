@@ -1,15 +1,13 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-import centralities as ct
 from bisect import insort
-import test
 import centralities
 
 if __name__ == '__main__':
 
     # importing graph
     with open("graph.txt") as file:
-        edges = [tuple(map(int,line.strip().split())) for line in file]
+        edges = [tuple(map(int, line.strip().split())) for line in file]
 
     nodes = []
     for x, y in edges:
@@ -60,19 +58,9 @@ if __name__ == '__main__':
 
     # adding edge_colors and showing graph
     # edge_colors = ['r' if edge == new_edge or edge == (new_edge[1], new_edge[0]) else 'k' for edge in new_graph.edges]
-    # pos = nx.drawing.layout.spring_layout (graph, k=1, seed=200)
+    # pos = nx.drawing.layout.spring_layout (new_graph, k=1, seed=200)
     # nx.draw(new_graph, with_labels=True, edge_color=edge_colors)
     # plt.show()
-
-    #centralities
-    # centralities = {}
-    # new_centralities = {}
-    #
-    # centralities = ct.degree(graph)
-    # new_centralities = ct.degree(new_graph)
-    #
-    # for k in centralities:
-    #     print(str(k) + ' : ' + str(centralities[k]) + ' , ' + str(new_centralities[k]))
 
     eigen = centralities.eigenvector(graph)
     new_eigen = centralities.eigenvector(new_graph)
@@ -90,7 +78,6 @@ if __name__ == '__main__':
     #         print('after edge')
     #         print(new_eigen)
 
-
     seeley = centralities.seeley(graph)
     new_seeley = centralities.seeley(new_graph)
 
@@ -102,13 +89,19 @@ if __name__ == '__main__':
     #         print('after edge')
     #         print(new_seeley)
 
-    #print('seeley(' + str(new_edge[0]) + ') before: ' + str(round(seeley[new_edge[0]], 5)))
-    #print('seeley(' + str(new_edge[0]) + ') after: ' + str(round(new_seeley[new_edge[0]], 5)))
-    #print('seeley(' + str(new_edge[1]) + ') before: ' + str(round(new_seeley[new_edge[1]], 5)))
-    #print('seeley(' + str(new_edge[1]) + ') after: ' + str(round(new_seeley[new_edge[1]], 5)))
+    # print('seeley(' + str(new_edge[0]) + ') before: ' + str(round(seeley[new_edge[0]], 5)))
+    # print('seeley(' + str(new_edge[0]) + ') after: ' + str(round(new_seeley[new_edge[0]], 5)))
+    # print('seeley(' + str(new_edge[1]) + ') before: ' + str(round(new_seeley[new_edge[1]], 5)))
+    # print('seeley(' + str(new_edge[1]) + ') after: ' + str(round(new_seeley[new_edge[1]], 5)))
 
-    print(eigen)
-    print(new_eigen)
-
-    print(seeley)
-    print(new_seeley)
+    # print('eigenvector before and after edge')
+    # print(eigen)
+    # print(new_eigen)
+    #
+    # print('seeley before and after edge')
+    # print(seeley)
+    # print(new_seeley)
+    #
+    # print('pagerank before and after edge')
+    # print(centralities.pagerank(graph, 1.0))
+    # print(centralities.pagerank(new_graph, 1.0))
