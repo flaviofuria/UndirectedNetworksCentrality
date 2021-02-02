@@ -1,5 +1,6 @@
 import networkx as nx
 import numpy as np
+import scipy
 
 
 def degree(g: nx.Graph()) -> dict:
@@ -47,26 +48,80 @@ def eigenvector(g: nx.Graph()) -> dict:
     return {k: round(v, 5) for k, v in nx.eigenvector_centrality(g).items()}
 
 
-def seeley(g: nx.Graph()) -> dict:
-    scores = {}
+# if norm is True, left eigenvector of the normalized adjacency matrix will be computed (Seeley centrality)
+# if norm is False, right eigenvector of the adjacency matrix will be computed (eigenvector centrality
+def seeley(g: nx.Graph(), norm: bool) -> dict:
+    scores = {k: 0 for k in range(1, len(g.nodes))}
     adj_mat = np.array([[0] * len(g.nodes)] * len(g.nodes), dtype=float)
     for k, v in nx.convert.to_dict_of_lists(g).items():
         for pos in v:
             adj_mat[k - 1][pos - 1] = 1
 
-    for i in range(len(g.nodes)):
-        row_sum = np.sum(adj_mat[i])
-        if row_sum > 0:
-            adj_mat[i] = np.divide(adj_mat[i], row_sum)
+    if norm:
+        for i in range(len(g.nodes)):
+            row_sum = np.sum(adj_mat[i])
+            if row_sum > 0:
+                adj_mat[i] = np.divide(adj_mat[i], row_sum)
 
-    eigenvalues, eigenvectors = np.linalg.eig(adj_mat)
-    dom_eigenvalue = max(np.amax(eigenvalues), np.absolute(np.amin(eigenvalues)))
-    max_eigenvalue_index = np.argmax(np.absolute(eigenvalues))
-    dom_eigenvector = np.vstack(eigenvectors[:, max_eigenvalue_index]).flatten()
+    # eigenvalues, eigenvectors = np.linalg.eig(adj_mat)
+    eigenvalues, eigenvectors = scipy.linalg.eig(adj_mat, left=norm, right=not norm)
+    dom_eigenvector = np.array([0] * len(g.nodes), dtype=float)
+    dom_eigenvalues_indices = []
+    for index in range(len(eigenvalues)):
+        if eigenvalues[index] == np.amax(eigenvalues):
+            dom_eigenvalues_indices.append(index)
+    if np.abs(np.amin(eigenvalues)) == np.abs(np.amin(eigenvalues)):
+        for index in range(len(eigenvalues)):
+            if eigenvalues[index] == np.amin(eigenvalues):
+                dom_eigenvalues_indices.append(index)
+    for index in dom_eigenvalues_indices:
+        if (np.vstack(eigenvectors[:, index]) >= 0).all():
+            dom_eigenvector = np.vstack(eigenvectors[:, index])
+            break
+        elif (np.vstack(eigenvectors[:, index]) <= 0).all():
+            dom_eigenvector = np.vstack(eigenvectors[:, index])
+            dom_eigenvector *= -1
+            break
+    if (dom_eigenvector == 0).all():
+        print('dominant eigenvector has values of different signs')
 
+    dom_eigenvector_sum = sum(dom_eigenvector)
+    dom_eigenvector /= dom_eigenvector_sum
+    dom_eigenvector = dom_eigenvector.flatten()
     for i in range(len(dom_eigenvector)):
         scores[i+1] = dom_eigenvector[i]
+    scores = {k: round(v, 5) for k, v in scores.items()}
+
     return scores
+
+# if norm is True, left eigenvector of the normalized adjacency matrix will be computed (Seeley centrality)
+# if norm is False, right eigenvector of the adjacency matrix will be computed (eigenvector centrality
+def power_iteration(g: nx.Graph(), norm: bool) -> dict:
+    vector = np.random.rand(len(g.nodes))
+    vector_sum = sum(vector)
+    vector /= vector_sum
+    adj_mat = np.array([[0] * len(g.nodes)] * len(g.nodes), dtype=float)
+
+    for k, v in nx.convert.to_dict_of_lists(g).items():
+        for pos in v:
+            adj_mat[k - 1][pos - 1] = 1
+
+    if norm:
+        for i in range(len(g.nodes)):
+            row_sum = np.sum(adj_mat[i])
+            if row_sum > 0:
+                adj_mat[i] = np.divide(adj_mat[i], row_sum)
+
+    for _ in range(1000):
+        if norm:
+            vector_next = np.dot(vector, adj_mat)
+        else:
+            vector_next = np.dot(adj_mat, vector)
+        vector_next_norm = np.linalg.norm(vector_next)
+        vector = vector_next / vector_next_norm
+    vector_sum = sum(vector)
+    vector /= vector_sum
+    return {k: v for k, v in enumerate(vector)}
 
 
 def katz(g: nx.Graph()) -> dict:
@@ -74,7 +129,7 @@ def katz(g: nx.Graph()) -> dict:
 
 
 # default alpha=0.85
-# choosing alpha=1.0 should result in computing Seeley centrality
+# choosing alpha=1.0 should result in computing Seeley centrality but convergence is not guaranteed
 def pagerank(g: nx.Graph(), a: float) -> dict:
     return nx.pagerank(g, alpha=a, max_iter=1000)
 

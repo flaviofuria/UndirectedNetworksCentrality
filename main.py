@@ -62,46 +62,7 @@ if __name__ == '__main__':
     # nx.draw(new_graph, with_labels=True, edge_color=edge_colors)
     # plt.show()
 
-    eigen = centralities.eigenvector(graph)
-    new_eigen = centralities.eigenvector(new_graph)
 
-    # print('eigen(' + str(new_edge[0]) + ') before: ' + str(round(eigen[new_edge[0]], 5)))
-    # print('eigen(' + str(new_edge[0]) + ') after: ' + str(round(new_eigen[new_edge[0]], 5)))
-    # print('eigen(' + str(new_edge[1]) + ') before: ' + str(round(new_eigen[new_edge[1]], 5)))
-    # print('eigen(' + str(new_edge[1]) + ') after: ' + str(round(new_eigen[new_edge[1]], 5)))
-    # print('\n')
-    # for k in eigen.keys():
-    #     if new_eigen[k] < eigen[k] and (k == new_edge[0] or k == new_edge[1]):
-    #         print('WEAK MONOTONICITY AXIOM FAILED IN NODE ' + str(k) + ' FOR EIGENVECTOR CENTRALITY')
-    #         print('before edge')
-    #         print(eigen)
-    #         print('after edge')
-    #         print(new_eigen)
 
-    seeley = centralities.seeley(graph)
-    new_seeley = centralities.seeley(new_graph)
 
-    # for k in seeley.keys():
-    #     if new_seeley[k] < seeley[k] and (k == new_edge[0] or k == new_edge[1]):
-    #         print('WEAK MONOTONICITY AXIOM FAILED IN NODE ' + str(k) + ' FOR SEELEY CENTRALITY')
-    #         print('before edge')
-    #         print(seeley)
-    #         print('after edge')
-    #         print(new_seeley)
 
-    # print('seeley(' + str(new_edge[0]) + ') before: ' + str(round(seeley[new_edge[0]], 5)))
-    # print('seeley(' + str(new_edge[0]) + ') after: ' + str(round(new_seeley[new_edge[0]], 5)))
-    # print('seeley(' + str(new_edge[1]) + ') before: ' + str(round(new_seeley[new_edge[1]], 5)))
-    # print('seeley(' + str(new_edge[1]) + ') after: ' + str(round(new_seeley[new_edge[1]], 5)))
-
-    # print('eigenvector before and after edge')
-    # print(eigen)
-    # print(new_eigen)
-    #
-    # print('seeley before and after edge')
-    # print(seeley)
-    # print(new_seeley)
-    #
-    # print('pagerank before and after edge')
-    # print(centralities.pagerank(graph, 1.0))
-    # print(centralities.pagerank(new_graph, 1.0))
