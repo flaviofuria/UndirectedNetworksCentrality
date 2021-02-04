@@ -62,6 +62,35 @@ if __name__ == '__main__':
     # nx.draw(new_graph, with_labels=True, edge_color=edge_colors)
     # plt.show()
 
+    # computing eigenvcector centrality and seeley
+    # using numpy for the graph without the edge
+    eigenvector = centralities.seeley(graph, False)
+    seeley = centralities.seeley(graph, True)
+    # using power iteration for the graph without the edge
+    power = centralities.power_iteration(graph, False)
+    power_seeley = centralities.power_iteration(graph, True)
+    # using numpy for the new graph
+    new_eigenvector = centralities.seeley(new_graph, False)
+    new_seeley = centralities.seeley(new_graph, True)
+    # using power iteration for the new graph
+    new_power = centralities.power_iteration(new_graph, False)
+    new_power_seeley = centralities.power_iteration(new_graph, True)
+
+    # printing centralities
+    print('prima')
+    print(eigenvector)
+    print(power)
+    print(seeley)
+    print(power_seeley)
+    print('dopo')
+    print(new_eigenvector)
+    print(new_power)
+    print(new_seeley)
+    print(new_power_seeley)
+
+    # networkx implementation of eigenvector centrality
+    # print(nx.eigenvector_centrality(graph))
+    # print(nx.eigenvector_centrality(new_graph))
 
 
 

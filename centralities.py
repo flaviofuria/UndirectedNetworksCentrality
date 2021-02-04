@@ -1,6 +1,7 @@
 import networkx as nx
 import numpy as np
 import scipy
+import decimal
 
 
 def degree(g: nx.Graph()) -> dict:
@@ -57,24 +58,38 @@ def seeley(g: nx.Graph(), norm: bool) -> dict:
         for pos in v:
             adj_mat[k - 1][pos - 1] = 1
 
+# normalizing adjacency matrix
     if norm:
         for i in range(len(g.nodes)):
             row_sum = np.sum(adj_mat[i])
             if row_sum > 0:
                 adj_mat[i] = np.divide(adj_mat[i], row_sum)
 
-    # eigenvalues, eigenvectors = np.linalg.eig(adj_mat)
+    # computing eigenvalues and eigenvectors
     eigenvalues, eigenvectors = scipy.linalg.eig(adj_mat, left=norm, right=not norm)
+    eigenvalues = np.round(eigenvalues, 5)
+    eigenvectors = np.round(eigenvectors, 5)
     dom_eigenvector = np.array([0] * len(g.nodes), dtype=float)
+
+    # finding dominant eigenvalue's index
+    # if the dominant eigenvalue has an eigenspace >=1, we have no guarantee on the dominant_eigenvector
     dom_eigenvalues_indices = []
     for index in range(len(eigenvalues)):
         if eigenvalues[index] == np.amax(eigenvalues):
             dom_eigenvalues_indices.append(index)
-    if np.abs(np.amin(eigenvalues)) == np.abs(np.amin(eigenvalues)):
-        for index in range(len(eigenvalues)):
-            if eigenvalues[index] == np.amin(eigenvalues):
-                dom_eigenvalues_indices.append(index)
+
+    if len(dom_eigenvalues_indices) > 1:
+        print('eigenspace of the dominant eigenvalue is greater than 1')
+
+    # if np.abs(np.amin(eigenvalues)) == np.abs(np.amax(eigenvalues)):
+    #     for index in range(len(eigenvalues)):
+    #         if eigenvalues[index] == np.amin(eigenvalues):
+    #            dom_eigenvalues_indices.append(index)
+
+    # finding dominant eigenvector
     for index in dom_eigenvalues_indices:
+        if eigenvalues[index] < np.abs(np.amin(eigenvalues)):
+            print('there is a negative eigenvalue strictly bigger than the dominant eigenvalue')
         if (np.vstack(eigenvectors[:, index]) >= 0).all():
             dom_eigenvector = np.vstack(eigenvectors[:, index])
             break
@@ -84,9 +99,8 @@ def seeley(g: nx.Graph(), norm: bool) -> dict:
             break
     if (dom_eigenvector == 0).all():
         print('dominant eigenvector has values of different signs')
-
     dom_eigenvector_sum = sum(dom_eigenvector)
-    dom_eigenvector /= dom_eigenvector_sum
+    # dom_eigenvector /= dom_eigenvector_sum
     dom_eigenvector = dom_eigenvector.flatten()
     for i in range(len(dom_eigenvector)):
         scores[i+1] = dom_eigenvector[i]
@@ -94,25 +108,27 @@ def seeley(g: nx.Graph(), norm: bool) -> dict:
 
     return scores
 
+
 # if norm is True, left eigenvector of the normalized adjacency matrix will be computed (Seeley centrality)
 # if norm is False, right eigenvector of the adjacency matrix will be computed (eigenvector centrality
 def power_iteration(g: nx.Graph(), norm: bool) -> dict:
     vector = np.random.rand(len(g.nodes))
-    vector_sum = sum(vector)
-    vector /= vector_sum
+    # vector = np.array([1] * len(g.nodes), dtype=float)
+    # vector_sum = sum(vector)
+    # vector /= vector_sum
     adj_mat = np.array([[0] * len(g.nodes)] * len(g.nodes), dtype=float)
 
     for k, v in nx.convert.to_dict_of_lists(g).items():
         for pos in v:
             adj_mat[k - 1][pos - 1] = 1
 
-    if norm:
+    if not norm:
         for i in range(len(g.nodes)):
             row_sum = np.sum(adj_mat[i])
             if row_sum > 0:
                 adj_mat[i] = np.divide(adj_mat[i], row_sum)
 
-    for _ in range(1000):
+    for _ in range(100):
         if norm:
             vector_next = np.dot(vector, adj_mat)
         else:
@@ -120,8 +136,9 @@ def power_iteration(g: nx.Graph(), norm: bool) -> dict:
         vector_next_norm = np.linalg.norm(vector_next)
         vector = vector_next / vector_next_norm
     vector_sum = sum(vector)
-    vector /= vector_sum
-    return {k: v for k, v in enumerate(vector)}
+    # vector /= vector_sum
+    return {k+1: v for k, v in enumerate(vector)}
+
 
 
 def katz(g: nx.Graph()) -> dict:
