@@ -100,7 +100,7 @@ def seeley(g: nx.Graph(), norm: bool) -> dict:
     if (dom_eigenvector == 0).all():
         print('dominant eigenvector has values of different signs')
     dom_eigenvector_sum = sum(dom_eigenvector)
-    # dom_eigenvector /= dom_eigenvector_sum
+    dom_eigenvector /= dom_eigenvector_sum
     dom_eigenvector = dom_eigenvector.flatten()
     for i in range(len(dom_eigenvector)):
         scores[i+1] = dom_eigenvector[i]
@@ -136,7 +136,7 @@ def power_iteration(g: nx.Graph(), norm: bool) -> dict:
         vector_next_norm = np.linalg.norm(vector_next)
         vector = vector_next / vector_next_norm
     vector_sum = sum(vector)
-    # vector /= vector_sum
+    vector /= vector_sum
     return {k+1: v for k, v in enumerate(vector)}
 
 
