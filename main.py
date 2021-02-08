@@ -2,96 +2,72 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from bisect import insort
 import centralities
+import test
+import graph_handling
+from pprint import pprint
+import numpy as np
 
 if __name__ == '__main__':
 
-    # importing graph
-    with open("graph.txt") as file:
-        edges = [tuple(map(int, line.strip().split())) for line in file]
+    new_edge = (1, 3)
+    k, head, tail = 5, 1, 4
+    graph, new_graph = graph_handling.create(new_edge[0], new_edge[1])
 
-    nodes = []
-    for x, y in edges:
-        if x not in nodes:
-            insort(nodes, x)
-        if y not in nodes:
-            insort(nodes, y)
+    # creating graph with k_path
+    path = graph_handling.k_path(new_graph, k, head, tail)
+    k_path_edges = list(set(path.edges) - set(new_graph.edges))
 
-    # adding isolated nodes
-    isolated = True
-    if isolated:
-        isolated_nodes = [int(item) for item in input("add, if present, isolated nodes (separated by a whitespace) : ").split()]
-        for node in isolated_nodes:
-            if node not in nodes:
-                insort(nodes, node)
+    # creating graph with k_clique
+    clique = graph_handling.k_clique(new_graph, k, head, tail)
+    k_clique_edges = list(set(clique.edges) - set(new_graph.edges))
 
-    # creating graph
-    temp_graph = nx.empty_graph()
-    temp_graph.add_nodes_from(nodes)
-    temp_graph.add_edges_from(edges)
+    # computing scores for old and new k_path and k_clique graph
+    k_path_score, k_clique_score = centralities.eigenvector_at_k(graph, k, head, tail, False)
+    new_k_path_score, new_k_clique_score = centralities.eigenvector_at_k(new_graph, k, head, tail, False)
 
-    # adding new_edge
-    new_edge = tuple(map(int, input('insert new edge: ').split()))
-    if len(new_edge) != 2 or new_edge in temp_graph.edges:
-        exit(1)
-    new_edges = edges
-    new_edges.append(new_edge)
-    new_nodes = nodes
-    if new_edge[0] not in new_nodes:
-        insort(new_nodes, new_edge[0])
-    if new_edge[1] not in new_nodes:
-        insort(new_nodes, new_edge[1])
+    # scores of first and second node for old k_path graph
+    first_node_scores_path = [k_path_score[k][new_edge[0]] for k in k_path_score.keys()]
+    second_node_scores_path = [k_path_score[k][new_edge[1]] for k in k_path_score.keys()]
 
-    print('For matters of consistency, nodes should be labeled from 1 to *node cardinality*, without holes.\nFor this reason, labels will be remapped.')
+    # scores of first and second node for new k_path graph
+    new_first_node_scores_path = [new_k_path_score[k][new_edge[0]] for k in new_k_path_score.keys()]
+    new_second_node_scores_path = [new_k_path_score[k][new_edge[1]] for k in new_k_path_score.keys()]
 
-    # creating new_graph
-    temp_new_graph = nx.empty_graph()
-    temp_new_graph.add_nodes_from(new_nodes)
-    temp_new_graph.add_edges_from(new_edges)
+    # score differences for k_path graph
+    first_node_diff_path = [x - y for x, y in zip(new_first_node_scores_path, first_node_scores_path)]
+    second_node_diff_path = [x - y for x, y in zip(new_second_node_scores_path, second_node_scores_path)]
 
-    # mapping
-    mapping = {x: y for y, x in enumerate(temp_graph.nodes, 1)}
-    graph = nx.relabel_nodes(temp_graph, mapping)
+    # scores of first and second node for old k_clique graph
+    first_node_scores_clique = [k_clique_score[k][new_edge[0]] for k in k_clique_score.keys()]
+    second_node_scores_clique = [k_clique_score[k][new_edge[1]] for k in k_clique_score.keys()]
 
-    # new_mapping
-    new_mapping = {x: y for y, x in enumerate(temp_new_graph.nodes, 1)}
-    new_graph = nx.relabel_nodes(temp_new_graph, new_mapping)
+    # scores of first and second node for new k_clique graph
+    new_first_node_scores_clique = [new_k_clique_score[k][new_edge[0]] for k in new_k_clique_score.keys()]
+    new_second_node_scores_clique = [new_k_clique_score[k][new_edge[1]] for k in new_k_clique_score.keys()]
 
-    # adding edge_colors and showing graph
-    # edge_colors = ['r' if edge == new_edge or edge == (new_edge[1], new_edge[0]) else 'k' for edge in new_graph.edges]
-    # pos = nx.drawing.layout.spring_layout (new_graph, k=1, seed=200)
-    # nx.draw(new_graph, with_labels=True, edge_color=edge_colors)
-    # plt.show()
+    # score differences for k_clique graph
+    first_node_diff_clique = [x - y for x, y in zip(new_first_node_scores_clique, first_node_scores_clique)]
+    second_node_diff_clique = [x - y for x, y in zip(new_second_node_scores_clique, second_node_scores_clique)]
 
-    # computing eigenvcector centrality and seeley
-    # using numpy for the graph without the edge
-    eigenvector = centralities.seeley(graph, False)
-    seeley = centralities.seeley(graph, True)
-    # using power iteration for the graph without the edge
-    power = centralities.power_iteration(graph, False)
-    power_seeley = centralities.power_iteration(graph, True)
-    # using numpy for the new graph
-    new_eigenvector = centralities.seeley(new_graph, False)
-    new_seeley = centralities.seeley(new_graph, True)
-    # using power iteration for the new graph
-    new_power = centralities.power_iteration(new_graph, False)
-    new_power_seeley = centralities.power_iteration(new_graph, True)
+    plots = False
+    if plots:
+        graph_handling.show(path, new_edge[0], new_edge[1], k_path_edges)
+        graph_handling.show(clique, new_edge[0], new_edge[1], k_clique_edges)
 
-    # printing centralities
-    print('prima')
-    print(eigenvector)
-    print(power)
-    print(seeley)
-    print(power_seeley)
-    print('dopo')
-    print(new_eigenvector)
-    print(new_power)
-    print(new_seeley)
-    print(new_power_seeley)
-
-    # networkx implementation of eigenvector centrality
-    # print(nx.eigenvector_centrality(graph))
-    # print(nx.eigenvector_centrality(new_graph))
-
+        fig = plt.figure()
+        x = list(range(0, k+1))
+        y = first_node_diff_path
+        ax = plt.gca()
+        ax.plot(x, y)
+        ax.spines['left'].set_position('zero')
+        ax.spines['right'].set_color('none')
+        ax.spines['bottom'].set_position('zero')
+        ax.spines['top'].set_color('none')
+        plt.xlim(0, k)
+        plt.xlabel('k')
+        plt.ylabel('difference')
+        plt.ylim(-0.2, 0.5)
+        plt.show()
 
 
 
