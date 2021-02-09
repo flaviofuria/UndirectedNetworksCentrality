@@ -1,9 +1,9 @@
 import networkx as nx
 import numpy as np
 import scipy
+import graph_handling
 from typing import Tuple, List
 
-import test
 
 def degree(g: nx.Graph) -> dict:
     scores = {}
@@ -125,8 +125,8 @@ def eigenvector_at_k(g: nx.Graph, k: int, head: int, tail: int, norm: bool) -> T
     k_clique_score[0] = scores_at_zero
 
     for x in range(1, k+1):
-        path = test.k_path(g, x, head, tail)
-        clique = test.k_clique(g, x, head, tail)
+        path = graph_handling.k_path(g, x, head, tail)
+        clique = graph_handling.k_clique(g, x, head, tail)
         k_path_score[x] = eigenvector_seeley(path, norm)
         k_clique_score[x] = eigenvector_seeley(clique, norm)
     return k_path_score, k_clique_score

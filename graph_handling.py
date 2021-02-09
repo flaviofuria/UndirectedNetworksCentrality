@@ -1,7 +1,8 @@
 import networkx as nx
+import numpy as np
 import matplotlib.pyplot as plt
 from bisect import insort
-from typing import Tuple
+from typing import Tuple, List
 
 
 def create(node1: int, node2: int, isolated_nodes=None) -> Tuple[nx.Graph, nx.Graph]:
@@ -86,7 +87,8 @@ def k_clique(g: nx.Graph, k: int, head: int, tail: int) -> nx.Graph:
     return clique
 
 
-def show(g: nx.Graph, node1: int, node2: int, edges=None):
+def show(graph: nx.Graph, node1: int, node2: int, edges=None):
+    g = graph.copy()
     if (node1, node2) not in g.edges:
         g.add_edge(node1, node2)
     if edges is not None:
@@ -95,4 +97,24 @@ def show(g: nx.Graph, node1: int, node2: int, edges=None):
         edge_colors = ['r' if edge == (node1, node2) or edge == (node2, node1) else 'k' for edge in g.edges]
     pos = nx.drawing.layout.spring_layout(g, k=1, seed=200)
     nx.draw(g, with_labels=True, edge_color=edge_colors)
+    plt.show()
+
+
+def show_diff(y: np.array, title: str, node: int):
+    fig, ax = plt.subplots()
+    x = list(range(len(y)))
+
+    ax.plot(x, y)
+    ax.set(xlabel='k', ylabel=r'$\Delta$' + str(node))
+
+    ax.set_title(title)
+    ax.spines['left'].set_position('zero')
+    ax.spines['right'].set_color('none')
+    ax.spines['bottom'].set_position('zero')
+    ax.spines['top'].set_color('none')
+    ax.axes.set_xticklabels(['']*len(x))
+
+    plt.xlim(min(x), max(x))
+    plt.ylim(-0.15, 0.15)
+
     plt.show()
