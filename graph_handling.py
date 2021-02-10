@@ -5,12 +5,13 @@ from bisect import insort
 from typing import Tuple, List
 
 
-def create(node1: int, node2: int, isolated_nodes=None) -> Tuple[nx.Graph, nx.Graph]:
+def create(node1: int, node2: int, edges=None, isolated_nodes=None) -> Tuple[nx.Graph, nx.Graph]:
     new_edge = (node1, node2)
 
     # importing graph
-    with open("graph.txt") as file:
-        edges = [tuple(map(int, line.strip().split())) for line in file]
+    if edges is None:
+        with open("graph.txt") as file:
+            edges = [tuple(map(int, line.strip().split())) for line in file]
 
     nodes = []
     for x, y in edges:
@@ -63,11 +64,13 @@ def k_path(g: nx.Graph, k: int, head: int, tail: int) -> nx.Graph:
     if head not in path.nodes or tail not in path.nodes:
         print('head or tail are not in the graph')
         return -1
-
-    path.add_edge(head, max(path.nodes)+1)
-    k_edges = zip(range(max(path.nodes), max(path.nodes) + k - 1), range(max(path.nodes) + 1, max(path.nodes) + k))
-    path.add_edges_from(k_edges)
-    path.add_edge(max(path.nodes), tail)
+    if k == 0:
+        path.add_edge(head, tail)
+    else:
+        path.add_edge(head, max(path.nodes)+1)
+        k_edges = zip(range(max(path.nodes), max(path.nodes) + k - 1), range(max(path.nodes) + 1, max(path.nodes) + k))
+        path.add_edges_from(k_edges)
+        path.add_edge(max(path.nodes), tail)
     return path
 
 
@@ -76,14 +79,16 @@ def k_clique(g: nx.Graph, k: int, head: int, tail: int) -> nx.Graph:
     if head not in clique.nodes or tail not in clique.nodes:
         print('head or tail are not in the graph')
         return -1
-
-    clique.add_edge(head, max(clique.nodes)+1)
-    to_add = [x for x in range(max(clique.nodes), max(clique.nodes)+k)]
-    for x in to_add:
-        for y in to_add:
-            if x != y:
-                clique.add_edge(x, y)
-    clique.add_edge(max(clique.nodes), tail)
+    if k == 0:
+        clique.add_edge(head, tail)
+    else:
+        clique.add_edge(head, max(clique.nodes)+1)
+        to_add = [x for x in range(max(clique.nodes), max(clique.nodes)+k)]
+        for x in to_add:
+            for y in to_add:
+                if x != y:
+                    clique.add_edge(x, y)
+        clique.add_edge(max(clique.nodes), tail)
     return clique
 
 
@@ -100,10 +105,9 @@ def show(graph: nx.Graph, node1: int, node2: int, edges=None):
     plt.show()
 
 
-def show_diff(y: np.array, title: str, node: int):
+def show_diff(y: np.array, title: str, node: int, min_y=-0.30, max_y=0.30):
     fig, ax = plt.subplots()
     x = list(range(len(y)))
-
     ax.plot(x, y)
     ax.set(xlabel='k', ylabel=r'$\Delta$' + str(node))
 
@@ -113,8 +117,9 @@ def show_diff(y: np.array, title: str, node: int):
     ax.spines['bottom'].set_position('zero')
     ax.spines['top'].set_color('none')
     ax.axes.set_xticklabels(['']*len(x))
+    ax.axes.set_xticks(x)
 
     plt.xlim(min(x), max(x))
-    plt.ylim(-0.15, 0.15)
+    plt.ylim(min_y, max_y)
 
     plt.show()

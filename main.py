@@ -4,8 +4,8 @@ import graph_handling
 
 if __name__ == '__main__':
 
-    new_edge = (1, 3)
-    k, head, tail = 5, 1, 3
+    new_edge = (1, 2)
+    k, head, tail = 10, 6, 3
     graph, new_graph = graph_handling.create(new_edge[0], new_edge[1])
 
     # creating graph with k_path

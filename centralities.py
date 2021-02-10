@@ -80,11 +80,10 @@ def eigenspace(g: nx.Graph, norm: bool) -> List[Tuple]:
 # if norm is True, left eigenvector of the normalized adjacency matrix will be computed (Seeley centrality)
 # if norm is False, right eigenvector of the adjacency matrix will be computed (eigenvector centrality)
 def eigenvector_seeley(g: nx.Graph, norm: bool) -> dict:
-    scores = {k: 0 for k in range(1, len(g.nodes))}
+    scores = {k: 0 for k in g.nodes}
     dom_eigenvector = np.array([0] * len(g.nodes), dtype=float)
 
     eigenvalues, eigenvectors = eig(g, norm)
-
     # finding dominant eigenvalue's index
     # if the dominant eigenvalue has an eigenspace >=1, we have no guarantee on the dominant_eigenvector
     dom_eigenvalues_indices = []
@@ -109,8 +108,8 @@ def eigenvector_seeley(g: nx.Graph, norm: bool) -> dict:
     if (dom_eigenvector == 0).all():
         print('dominant eigenvector has values of different signs')
     dom_eigenvector_sum = sum(dom_eigenvector)
-    dom_eigenvector /= dom_eigenvector_sum
     dom_eigenvector = dom_eigenvector.flatten()
+    #dom_eigenvector /= dom_eigenvector_sum
     for i in range(len(dom_eigenvector)):
         scores[i+1] = dom_eigenvector[i]
     scores = {k: round(v, 5) for k, v in scores.items()}
@@ -119,12 +118,12 @@ def eigenvector_seeley(g: nx.Graph, norm: bool) -> dict:
 
 
 def eigenvector_at_k(g: nx.Graph, k: int, head: int, tail: int, norm: bool) -> Tuple[dict, dict]:
-    scores_at_zero = eigenvector_seeley(g, False)
+    # scores_at_zero = eigenvector_seeley(g, False)
     k_path_score, k_clique_score = {}, {}
-    k_path_score[0] = scores_at_zero
-    k_clique_score[0] = scores_at_zero
+    # k_path_score[0] = scores_at_zero
+    # k_clique_score[0] = scores_at_zero
 
-    for x in range(1, k+1):
+    for x in range(0, k+1):
         path = graph_handling.k_path(g, x, head, tail)
         clique = graph_handling.k_clique(g, x, head, tail)
         k_path_score[x] = eigenvector_seeley(path, norm)
@@ -134,7 +133,7 @@ def eigenvector_at_k(g: nx.Graph, k: int, head: int, tail: int, norm: bool) -> T
 
 # if norm is True, left eigenvector of the normalized adjacency matrix will be computed (Seeley centrality)
 # if norm is False, right eigenvector of the adjacency matrix will be computed (eigenvector centrality
-def power_iteration(g: nx.Graph, norm: bool) -> dict:
+def power_iteration(g: nx.Graph, norm: bool, tol=1e-3) -> dict:
     vector = np.random.rand(len(g.nodes))
     # vector = np.array([1] * len(g.nodes), dtype=float)
     # vector_sum = sum(vector)
@@ -151,15 +150,20 @@ def power_iteration(g: nx.Graph, norm: bool) -> dict:
             if row_sum > 0:
                 adj_mat[i] = np.divide(adj_mat[i], row_sum)
 
-    for _ in range(100):
+    for i in range(1000):
         if norm:
             vector_next = np.dot(vector, adj_mat)
         else:
             vector_next = np.dot(adj_mat, vector)
         vector_next_norm = np.linalg.norm(vector_next)
-        vector = vector_next / vector_next_norm
+
+        if np.linalg.norm(vector-vector_next) > tol:
+            vector = vector_next / vector_next_norm
+        else:
+            print('Algorithm stopped at ' + str(i) + '-th iteration because the norm of the vector is lesser than ' + str(tol) + ' wrt to that of the previous one')
+            break
     vector_sum = sum(vector)
-    vector /= vector_sum
+    #vector /= vector_sum
     return {k+1: v for k, v in enumerate(vector)}
 
 
