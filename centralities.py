@@ -109,7 +109,7 @@ def eigenvector_seeley(g: nx.Graph, norm: bool) -> dict:
         print('dominant eigenvector has values of different signs')
     dom_eigenvector_sum = sum(dom_eigenvector)
     dom_eigenvector = dom_eigenvector.flatten()
-    #dom_eigenvector /= dom_eigenvector_sum
+    dom_eigenvector /= dom_eigenvector_sum
     for i in range(len(dom_eigenvector)):
         scores[i+1] = dom_eigenvector[i]
     scores = {k: round(v, 5) for k, v in scores.items()}
@@ -134,6 +134,9 @@ def eigenvector_at_k(g: nx.Graph, k: int, head: int, tail: int, norm: bool) -> T
 # if norm is True, left eigenvector of the normalized adjacency matrix will be computed (Seeley centrality)
 # if norm is False, right eigenvector of the adjacency matrix will be computed (eigenvector centrality
 def power_iteration(g: nx.Graph, norm: bool, tol=1e-3) -> dict:
+    eigen = eigenspace(g, False)
+    if eigen[0][0] == abs(eigen[-1][0]):
+        print('the two largest eigenvalues have the same module, so it is very likely that power iteration will not converge.')
     vector = np.random.rand(len(g.nodes))
     # vector = np.array([1] * len(g.nodes), dtype=float)
     # vector_sum = sum(vector)
@@ -150,7 +153,7 @@ def power_iteration(g: nx.Graph, norm: bool, tol=1e-3) -> dict:
             if row_sum > 0:
                 adj_mat[i] = np.divide(adj_mat[i], row_sum)
 
-    for i in range(1000):
+    for i in range(10000):
         if norm:
             vector_next = np.dot(vector, adj_mat)
         else:
@@ -163,7 +166,7 @@ def power_iteration(g: nx.Graph, norm: bool, tol=1e-3) -> dict:
             print('Algorithm stopped at ' + str(i) + '-th iteration because the norm of the vector is lesser than ' + str(tol) + ' wrt to that of the previous one')
             break
     vector_sum = sum(vector)
-    #vector /= vector_sum
+    vector /= vector_sum
     return {k+1: v for k, v in enumerate(vector)}
 
 
