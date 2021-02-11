@@ -47,10 +47,10 @@ def harmonic(g: nx.Graph) -> dict:
 
 
 def eigenvector_centrality(g: nx.Graph) -> dict:
-    vec_sum = 0
+    vec_sum = 0.0
     for k, v in nx.eigenvector_centrality(g).items():
         vec_sum += v
-    return {k: round(v/vec_sum, 5) for k, v in nx.eigenvector_centrality(g).items()}
+    return {k: v/vec_sum for k, v in nx.eigenvector_centrality(g).items()}
 
 
 def eig(g: nx.Graph, norm: bool) -> Tuple[np.ndarray, np.ndarray]:
