@@ -47,7 +47,10 @@ def harmonic(g: nx.Graph) -> dict:
 
 
 def eigenvector_centrality(g: nx.Graph) -> dict:
-    return {k: round(v, 5) for k, v in nx.eigenvector_centrality(g).items()}
+    vec_sum = 0
+    for k, v in nx.eigenvector_centrality(g).items():
+        vec_sum += v
+    return {k: round(v/vec_sum, 5) for k, v in nx.eigenvector_centrality(g).items()}
 
 
 def eig(g: nx.Graph, norm: bool) -> Tuple[np.ndarray, np.ndarray]:
@@ -92,12 +95,12 @@ def eigenvector_seeley(g: nx.Graph, norm: bool) -> dict:
             dom_eigenvalues_indices.append(index)
 
     if len(dom_eigenvalues_indices) > 1:
-        print('eigenspace of the dominant eigenvalue is greater than 1')
+        print('Eigenspace of the dominant eigenvalue is greater than 1')
 
     # finding dominant eigenvector
     for index in dom_eigenvalues_indices:
         if eigenvalues[index] < np.abs(np.amin(eigenvalues)):
-            print('there is a negative eigenvalue strictly bigger than the dominant eigenvalue')
+            print('There is a negative eigenvalue strictly bigger than the dominant eigenvalue')
         if (np.vstack(eigenvectors[:, index]) >= 0).all():
             dom_eigenvector = np.vstack(eigenvectors[:, index])
             break
@@ -106,7 +109,7 @@ def eigenvector_seeley(g: nx.Graph, norm: bool) -> dict:
             dom_eigenvector *= -1
             break
     if (dom_eigenvector == 0).all():
-        print('dominant eigenvector has values of different signs')
+        print('Dominant eigenvector has values of different signs')
     dom_eigenvector_sum = sum(dom_eigenvector)
     dom_eigenvector = dom_eigenvector.flatten()
     dom_eigenvector /= dom_eigenvector_sum
@@ -136,7 +139,7 @@ def eigenvector_at_k(g: nx.Graph, k: int, head: int, tail: int, norm: bool) -> T
 def power_iteration(g: nx.Graph, norm: bool, tol=1e-3) -> dict:
     eigen = eigenspace(g, False)
     if eigen[0][0] == abs(eigen[-1][0]):
-        print('the two largest eigenvalues have the same module, so it is very likely that power iteration will not converge.')
+        print('The two largest eigenvalues have the same module, so it is very likely that power iteration will not converge.')
     vector = np.random.rand(len(g.nodes))
     # vector = np.array([1] * len(g.nodes), dtype=float)
     # vector_sum = sum(vector)
